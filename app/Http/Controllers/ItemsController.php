@@ -1,18 +1,17 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
-
 use \App\Item;
 
-  class ItemsController extends Controller
-  {
 
+class ItemsController extends Controller
+{
+    
     public function create()
     {
-        $keyword = request()->keyword;
+    $keyword = request()->keyword;
         $items = [];
         if ($keyword) {
             $client = new \RakutenRws_Client();
@@ -24,7 +23,7 @@ use \App\Item;
                 'hits' => 20,
             ]);
 
-    
+            // Creating "Item" instance to make it easy to handle.（not saving）
             foreach ($rws_response->getData()['Items'] as $rws_item) {
                 $item = new Item();
                 $item->code = $rws_item['Item']['itemCode'];
@@ -40,6 +39,14 @@ use \App\Item;
             'items' => $items,
         ]);
     }
-  }
-  
- ?>
+    public function show($id)
+    {
+      $item = Item::find($id);
+      $want_users = $item->want_users;
+
+      return view('items.show', [
+          'item' => $item,
+          'want_users' => $want_users,
+      ]);
+    }
+}
